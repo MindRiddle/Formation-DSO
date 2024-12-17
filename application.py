@@ -46,7 +46,9 @@ def view_file():
     filename = request.args.get('file')  # Paramètre `file` passé dans l'URL
     base_path = os.path.abspath('./files')  # Répertoire sécurisé
     requested_path = os.path.abspath(os.path.join(base_path, filename))
-
+    #Vérification de sécurité pour empêcher la sortie du répertoire
+    if not requested_path.startswith(base_path) or not os.path.isfile(requested_path):
+        abort(403)
 
     try:
         with open(requested_path, 'r') as file:
@@ -65,6 +67,8 @@ def uploaded():
             err = "No file part"
             return render_template('error.html', err=err)
         file = request.files['file']
+
+
         if file.filename == '':
             err = "No selected file"
             return render_template('error.html', err=err)
