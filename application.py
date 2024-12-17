@@ -88,16 +88,19 @@ def uploaded():
                 return render_template('error.html', err=err)
             else:
                 print(f"{Fore.GREEN}[+] file uploded ! {file_name}{Fore.RESET}")
-                path = f'{Path(__file__).parent}'
-                path_full_write = f"{path}\\files\{file_name}"
-                content = readfile(file_name)
+                base_path = os.path.abspath('./files')
+                path_full_write = os.path.normpath(os.path.join(base_path, file_name))
+                if not path_full_write.startswith(base_path):
+                    err = "Invalid file path"
+                    return render_template('error.html', err=err)
+                content = readfile(path_full_write)
                 writefile(path_full_write, content)
 
 
     return render_template('upload.html', file_content=file_content)
 
-def  readfile(file_name):
-    with open (file_name, "r") as fichier:
+def  readfile(full_path):
+    with open (full_path, "r") as fichier:
         content = fichier.read()
     return content
 
@@ -112,7 +115,12 @@ def process_file(file_name):
     #Chargement du fichier YAML
     if ".yaml" in file_name or ".yml" in file_name:
         try:
-            with open(file_name,'rb') as f:
+            base_path = os.path.abspath('./files')
+            full_path = os.path.normpath(os.path.join(base_path, file_name))
+            if not full_path.startswith(base_path):
+                err = "Invalid file path"
+                return err
+            with open(full_path,'rb') as f:
                 content = f.read()
                 data = yaml.load(content, Loader=yaml.FullLoader) # Using vulnerable FullLoader
         except Exception as er:
