@@ -169,4 +169,4 @@ if __name__ == '__main__':
     directory = f'{Path(__file__).parent}'
     print(directory)
     gen_reqtxt(directory)
-    app.run(debug=True)
+    app.run(debug=False)
